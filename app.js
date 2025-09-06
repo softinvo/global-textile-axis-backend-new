@@ -7,16 +7,23 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const app = express();
 
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:5173",
+//       "https://bookmywarehouse.co",
+//       "https://dev.admin.bookmywarehouse.co",
+//       "https://admin.bookmywarehouse.co",
+//       "https://test.admin.bookmywarehouse.co",
+//       "*",
+//     ],
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://bookmywarehouse.co",
-      "https://dev.admin.bookmywarehouse.co",
-      "https://admin.bookmywarehouse.co",
-      "https://test.admin.bookmywarehouse.co",
-      "*",
-    ],
+    origin: true,
     credentials: true,
   })
 );
