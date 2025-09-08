@@ -18,12 +18,11 @@ const sellerSchema = new mongoose.Schema(
       default: "pending",
     },
     // Business Information
-    businessName: { type: String, required: true },
+    businessName: { type: String },
     businessRegistrationDate: { type: Date },
     businessType: {
       type: String,
       enum: ["wholeseller", "retailer", "manufacturer", "designer", "service"],
-      required: true,
     },
     businessRegistrationNumber: { type: String },
     gstNumber: { type: String },
@@ -45,10 +44,10 @@ const sellerSchema = new mongoose.Schema(
 
     // Banking details
     accountHolderName: { type: String },
-    accountType: { type: String, enum: ["savings", "current"] },
     bankName: { type: String },
     bankAccountNumber: { type: String },
     ifscCode: { type: String },
+
     panCardNumber: { type: String },
     gstNumber: { type: String },
     created_at: { type: Date, default: Date.now },
