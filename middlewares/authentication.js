@@ -31,7 +31,7 @@ exports.isBuyerAuth = async (req, res, next) => {
     const tokenDoc = await Token.findOne({
       token: token,
       objectDocId: decoded._id,
-      userType: "Buyer",
+      userType: "buyer",
     });
 
     if (!tokenDoc) {
@@ -47,6 +47,7 @@ exports.isBuyerAuth = async (req, res, next) => {
     }
 
     // Attach user
+    req.user = user;
     req.userId = user._id;
     next();
   } catch (err) {
@@ -84,7 +85,7 @@ exports.isSellerAuth = async (req, res, next) => {
     const tokenDoc = await Token.findOne({
       token: token,
       objectDocId: decoded._id,
-      userType: "Seller",
+      userType: "seller",
     });
 
     if (!tokenDoc) {
@@ -99,8 +100,8 @@ exports.isSellerAuth = async (req, res, next) => {
         .json({ success: false, message: "Token has expired" });
     }
 
-    // Attach partner
-    req.partnerId = partner._id;
+    // Attach seller
+    req.seller = seller;
     next();
   } catch (err) {
     console.error(err);
