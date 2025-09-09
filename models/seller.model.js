@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const documentSchema = require("./helpers/document.model");
 const jwt = require("jsonwebtoken");
 
 const sellerSchema = new mongoose.Schema(
@@ -7,10 +8,6 @@ const sellerSchema = new mongoose.Schema(
     name: { type: String },
     email: { type: String },
     company: { type: String },
-    address: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Address",
-    },
     phone: { type: String },
     profileStatus: {
       type: String,
@@ -19,37 +16,21 @@ const sellerSchema = new mongoose.Schema(
     },
     // Business Information
     businessName: { type: String },
-    businessRegistrationDate: { type: Date },
     businessType: {
       type: String,
       enum: ["wholeseller", "retailer", "manufacturer", "designer", "service"],
     },
-    businessRegistrationNumber: { type: String },
-    gstNumber: { type: String },
-
-    businessAddress: {
-      line1: { type: String },
-      line2: { type: String },
-      pincode: { type: String },
-      geolocation: {
-        type: {
-          type: String,
-          enum: ["Point"],
-        },
-        coordinates: {
-          type: [Number], // [lng, lat]
-        },
-      },
+    address: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
     },
+    documents: [documentSchema],
 
     // Banking details
     accountHolderName: { type: String },
     bankName: { type: String },
     bankAccountNumber: { type: String },
     ifscCode: { type: String },
-
-    panCardNumber: { type: String },
-    gstNumber: { type: String },
     created_at: { type: Date, default: Date.now },
   },
   {

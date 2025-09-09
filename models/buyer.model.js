@@ -18,6 +18,7 @@ const buyerSchema = new mongoose.Schema({
     aadharNumber: { type: String },
     panNumber: { type: String },
   },
+
   addresses: [
     {
       type: mongoose.Schema.Types.ObjectId,
