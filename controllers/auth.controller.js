@@ -13,13 +13,6 @@ const axios = require("axios");
 const {
   sendOtpSV,
   loginWithPhoneSV,
-  signUpUserSV,
-  loginWithEmailSV,
-  changePasswordSV,
-  forgetPasswordSV,
-  resetPasswordSV,
-  resetPasswordViaSmsSV,
-  changePhoneOrEmailSV,
 } = require("../schemaValidator/authValidator");
 
 // ################# Send Otp ##########################
@@ -232,5 +225,4 @@ const logout = async (req, res) => {
 module.exports = {
   sendOtpUser,
   loginWithPhone,
-  signUpUser,
 };
