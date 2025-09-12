@@ -42,37 +42,6 @@ const viewProfile = async (req, res) => {
 };
 
 // Edit Profile
-// const editProfile = async (req, res) => {
-//   try {
-//     const sellerId = req.sellerId;
-//     const validateReqBody = await updateSellerProfileSchema.validateAsync(
-//       req.body,
-//       { abortEarly: false }
-//     );
-
-//     const seller = await Seller.findByIdAndUpdate(
-//       sellerId,
-//       { $set: validateReqBody },
-//       { new: true, runValidators: true }
-//     );
-
-//     if (!seller) {
-//       return res
-//         .status(404)
-//         .json({ success: false, message: "Seller not found" });
-//     }
-
-//     return res
-//       .status(200)
-//       .json({ success: true, message: "Successfully Updated", data: seller });
-//   } catch (error) {
-//     console.error("Error in editProfile:", error);
-//     return res
-//       .status(500)
-//       .json({ success: false, message: "Internal Server Error" });
-//   }
-// };
-
 const editProfile = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
