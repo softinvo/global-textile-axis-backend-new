@@ -7,7 +7,6 @@ const sellerSchema = new mongoose.Schema(
     // Basic info
     name: { type: String },
     email: { type: String },
-    company: { type: String },
     phone: { type: String },
     profileStatus: {
       type: String,
@@ -16,6 +15,7 @@ const sellerSchema = new mongoose.Schema(
     },
     // Business Information
     businessName: { type: String },
+    businessRegistrationDate: { type: Date },
     businessType: {
       type: String,
       enum: ["wholeseller", "retailer", "manufacturer", "designer", "service"],

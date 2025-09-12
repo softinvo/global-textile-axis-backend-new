@@ -2,27 +2,26 @@ const Seller = require("../../models/seller.model");
 const Address = require("../../models/address.model");
 const mongoose = require("mongoose");
 const { addressSchema } = require("../../schemaValidator/address.validator");
+const {
+  updateSellerProfileSchema,
+} = require("../../schemaValidator/seller.profile.validator");
 
 const viewProfile = async (req, res) => {
   try {
-    const sellerId = new mongoose.Types.ObjectId(req.userId);
+    const sellerId = new mongoose.Types.ObjectId(req.sellerId);
 
     const sellerProfile = await Seller.aggregate([
+      { $match: { _id: sellerId } },
       {
-        $match: { _id: sellerId }, // match logged-in seller
-      },
-      {
-        $project: {
-          name: 1,
-          phone: 1,
-          email: 1,
-          gender: 1,
-          profileStatus: 1,
-          documentInfo: 1,
-          addresses: 1,
-          createdAt: 1,
+        $lookup: {
+          from: "addresses",
+          localField: "address",
+          foreignField: "_id",
+          as: "address",
         },
       },
+      { $unwind: { path: "$address", preserveNullAndEmptyArrays: true } },
+      // No $project → return all fields
     ]);
 
     if (!sellerProfile || sellerProfile.length === 0) {
@@ -34,34 +33,114 @@ const viewProfile = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Successfully fetched seller profile",
-      data: sellerProfile[0], // since it's an array
+      data: sellerProfile[0], // single seller object
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error in viewProfile:", error);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
 // Edit Profile
+// const editProfile = async (req, res) => {
+//   try {
+//     const sellerId = req.sellerId;
+//     const validateReqBody = await updateSellerProfileSchema.validateAsync(
+//       req.body,
+//       { abortEarly: false }
+//     );
+
+//     const seller = await Seller.findByIdAndUpdate(
+//       sellerId,
+//       { $set: validateReqBody },
+//       { new: true, runValidators: true }
+//     );
+
+//     if (!seller) {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Seller not found" });
+//     }
+
+//     return res
+//       .status(200)
+//       .json({ success: true, message: "Successfully Updated", data: seller });
+//   } catch (error) {
+//     console.error("Error in editProfile:", error);
+//     return res
+//       .status(500)
+//       .json({ success: false, message: "Internal Server Error" });
+//   }
+// };
+
 const editProfile = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const { name, phone, email, gender } = req.body;
+    const sellerId = req.sellerId;
 
-    const seller = await Seller.findByIdAndUpdate(
-      req.userId,
-      { name, phone, email, gender },
-      { new: true }
-    );
+    // ✅ validate seller fields (except address, we handle separately)
+    const { address, ...sellerData } =
+      await updateSellerProfileSchema.validateAsync(req.body);
 
-    if (!seller) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Seller not found" });
+    let addressId = null;
+
+    if (address) {
+      // ✅ validate address
+      const validatedAddress = await addressSchema.validateAsync(address);
+
+      const seller = await Seller.findById(sellerId).session(session);
+      if (!seller) {
+        await session.abortTransaction();
+        session.endSession();
+        return res
+          .status(404)
+          .json({ success: false, message: "Seller not found" });
+      }
+
+      if (seller.address) {
+        // ✅ Update existing address
+        const updatedAddress = await Address.findByIdAndUpdate(
+          seller.address,
+          validatedAddress,
+          { new: true, session }
+        );
+        addressId = updatedAddress._id;
+      } else {
+        // ✅ Create new address
+        const newAddress = await Address.create([validatedAddress], {
+          session,
+        });
+        addressId = newAddress[0]._id;
+      }
     }
 
-    res.status(200).json({ success: true, seller });
+    // ✅ Update seller profile
+    const updatedSeller = await Seller.findByIdAndUpdate(
+      sellerId,
+      {
+        ...sellerData,
+        ...(addressId && { address: addressId }),
+      },
+      { new: true, session }
+    ).populate("address");
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({
+      success: true,
+      message: "Successfully updated seller profile",
+      data: updatedSeller,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error" });
+    await session.abortTransaction();
+    session.endSession();
+    console.error(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
   }
 };
 

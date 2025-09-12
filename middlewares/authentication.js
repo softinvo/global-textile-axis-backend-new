@@ -1,13 +1,14 @@
 const jwt = require("jsonwebtoken");
 const Buyer = require("../models/buyer.model");
 const Seller = require("../models/seller.model");
-// const Admin = require("../models/adminModel");
+const Admin = require("../models/admin.model");
 const Token = require("../models/token.model");
 
 exports.isBuyerAuth = async (req, res, next) => {
   try {
     // Get the token from the request headers
     const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+
     // const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
@@ -63,6 +64,7 @@ exports.isSellerAuth = async (req, res, next) => {
     // Get the token from the request headers
     const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
     // const token = req.headers.authorization?.split(" ")[1];
+    console.log("Token:", token);
 
     if (!token) {
       return res
@@ -75,6 +77,7 @@ exports.isSellerAuth = async (req, res, next) => {
 
     // Find the seller based on the decoded token
     const seller = await Seller.findById(decoded._id);
+    console.log("Seller:", seller);
     if (!seller) {
       return res
         .status(401)
@@ -87,6 +90,7 @@ exports.isSellerAuth = async (req, res, next) => {
       objectDocId: decoded._id,
       userType: "seller",
     });
+    console.log("TokenDoc:", tokenDoc);
 
     if (!tokenDoc) {
       return res.status(401).json({ success: false, message: "Invalid token" });
@@ -102,6 +106,7 @@ exports.isSellerAuth = async (req, res, next) => {
 
     // Attach seller
     req.seller = seller;
+    req.sellerId = seller._id;
     next();
   } catch (err) {
     console.error(err);
@@ -111,52 +116,52 @@ exports.isSellerAuth = async (req, res, next) => {
   }
 };
 
-// exports.isAdminAuth = async (req, res, next) => {
-//   try {
-//     const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-//     if (!token) {
-//       return res
-//         .status(401)
-//         .json({ success: false, message: "No token provided" });
-//     }
+exports.isAdminAuth = async (req, res, next) => {
+  try {
+    const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "No token provided" });
+    }
 
-//     // Verify the token
-//     const decoded = jwt.verify(token, process.env.JWT_ADMIN_SECRET);
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_ADMIN_SECRET);
 
-//     // Find the partner based on the decoded token
-//     const admin = await Admin.findById(decoded._id);
-//     if (!admin) {
-//       return res
-//         .status(401)
-//         .json({ success: false, message: "Admin Not Found" });
-//     }
+    // Find the partner based on the decoded token
+    const admin = await Admin.findById(decoded._id);
+    if (!admin) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Admin Not Found" });
+    }
 
-//     // Find the token in the database
-//     const tokenDoc = await Token.findOne({
-//       token: token,
-//       objectDocId: decoded._id,
-//       userType: "Admin",
-//     });
+    // Find the token in the database
+    const tokenDoc = await Token.findOne({
+      token: token,
+      objectDocId: decoded._id,
+      userType: "admin",
+    });
 
-//     if (!tokenDoc) {
-//       return res.status(401).json({ success: false, message: "Invalid token" });
-//     }
+    if (!tokenDoc) {
+      return res.status(401).json({ success: false, message: "Invalid token" });
+    }
 
-//     // Check if the token is expired
-//     const now = new Date();
-//     if (now > new Date(tokenDoc.expired_at)) {
-//       return res
-//         .status(401)
-//         .json({ success: false, message: "Token has expired" });
-//     }
+    // Check if the token is expired
+    const now = new Date();
+    if (now > new Date(tokenDoc.expired_at)) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Token has expired" });
+    }
 
-//     // Attach partner
-//     req.adminId = admin._id;
-//     next();
-//   } catch (err) {
-//     console.error(err);
-//     return res
-//       .status(401)
-//       .json({ success: false, message: "Invalid or expired token" });
-//   }
-// };
+    // Attach partner
+    req.adminId = admin._id;
+    next();
+  } catch (err) {
+    console.error(err);
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid or expired token" });
+  }
+};

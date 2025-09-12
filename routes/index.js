@@ -3,9 +3,13 @@ const express = require("express");
 const authRoutes = require("./auth.routes");
 const buyerProfileRoutes = require("./buyer.profile.routes");
 const storageRoutes = require("./storage.routes");
+const sellerProfileRoutes = require("./seller.profile.routes");
+const adminAuthRoutes = require("./admin.authroute");
 module.exports = (app) => {
   // Use Routes
   app.use("/api/v1", authRoutes);
   app.use("/api/v1", buyerProfileRoutes);
   app.use("/api/v1", storageRoutes);
+  app.use("/api/v1", sellerProfileRoutes);
+  app.use("/api/v1", adminAuthRoutes);
 };

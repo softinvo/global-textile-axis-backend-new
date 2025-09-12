@@ -8,7 +8,7 @@ const tokenSchema = new mongoose.Schema({
   userType: {
     type: String,
     required: true,
-    enum: ["buyer", "seller"],
+    enum: ["buyer", "seller", "admin"],
   },
   token: {
     type: String,
