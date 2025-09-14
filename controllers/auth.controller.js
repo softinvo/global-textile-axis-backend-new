@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const Token = require("../models/token.model");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
+const connectDB = require("../config/database");
 // const { generateOTP } = require("../helpers/generateOTP");
 // const { sendOtpViaSMS, sendOtpViaEmail } = require("../helpers/sendotp");
 // const checkAvailability = require("../helpers/unique_phone_email");
@@ -18,6 +19,7 @@ const {
 // ################# Send Otp ##########################
 const sendOtpUser = async (req, res) => {
   try {
+    await connectDB();
     const validateReqBody = await sendOtpSV.validateAsync(req.body);
     const { otpType, phone, userType } = validateReqBody;
     // const otp = generateOTP();
