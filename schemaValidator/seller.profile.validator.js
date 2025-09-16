@@ -2,7 +2,7 @@ const Joi = require("joi");
 
 const addressSchema = Joi.object({
   isPrimary: Joi.boolean().default(false),
-  address: Joi.string().required(),
+  address: Joi.string().optional(),
   locality: Joi.string().optional(),
   landmark: Joi.string().optional(),
   geolocation: Joi.object({
@@ -11,15 +11,13 @@ const addressSchema = Joi.object({
       .items(Joi.number().required())
       .length(2) // [longitude, latitude]
       .required(),
-  }).required(),
+  }).optional(),
   pincode: Joi.string().required(),
   state: Joi.string().required(),
   country: Joi.string().required(),
   formattedAddress: Joi.string().optional(),
-  name: Joi.string().required(),
-  phoneNumber: Joi.string()
-    .pattern(/^\+?[0-9]{10,15}$/)
-    .required(),
+  name: Joi.string().optional(),
+  phoneNumber: Joi.string().optional(),
 });
 
 const documentSchema = Joi.object({
@@ -44,6 +42,14 @@ const updateSellerProfileSchema = Joi.object({
   name: Joi.string().optional(),
   email: Joi.string().email().optional(),
   businessName: Joi.string().optional(),
+  gender: Joi.string().valid("male", "female", "other").optional(),
+  avatar: Joi.object({
+    fileUrl: Joi.string().uri().required(),
+    fileName: Joi.string().optional(),
+    fileType: Joi.string().optional(),
+    fileExtension: Joi.string().optional(),
+    uploadedAt: Joi.date().optional(),
+  }).optional(),
   businessRegistrationDate: Joi.date().optional(),
   businessType: Joi.string()
     .valid("wholeseller", "retailer", "manufacturer", "designer", "service")

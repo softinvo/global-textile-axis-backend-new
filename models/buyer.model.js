@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const attachmentSchema = require("./helpers/attachment.model");
 const jwt = require("jsonwebtoken");
 
 const buyerSchema = new mongoose.Schema({
@@ -6,10 +7,11 @@ const buyerSchema = new mongoose.Schema({
   phone: { type: String },
   email: { type: String },
   gender: { type: String, enum: ["Male", "Female", "Other"] },
+  avatar: { type: attachmentSchema },
   profileStatus: {
     type: String,
-    enum: ["pending", "approved", "rejected"],
-    default: "pending",
+    enum: ["active", "inactive", "suspended", "deleted"],
+    default: "active",
   },
   documentInfo: {
     nameAsPerRecords: { type: String },

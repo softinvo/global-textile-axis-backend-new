@@ -173,6 +173,7 @@ const loginWithPhone = async (req, res) => {
             phone: { $ifNull: ["$phone", ""] },
             name: { $ifNull: ["$name", ""] },
             profileStatus: { $ifNull: ["$profileStatus", ""] },
+            verificationStatus: { $ifNull: ["$verificationStatus", ""] },
           },
         },
       ]);

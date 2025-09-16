@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const documentSchema = require("./helpers/document.model");
+const attachmentSchema = require("./helpers/attachment.model");
 const jwt = require("jsonwebtoken");
 
 const sellerSchema = new mongoose.Schema(
@@ -8,11 +9,21 @@ const sellerSchema = new mongoose.Schema(
     name: { type: String },
     email: { type: String },
     phone: { type: String },
+    gender: { type: String, enum: ["male", "female", "other"] },
+    avatar: {
+      type: attachmentSchema,
+    },
     profileStatus: {
       type: String,
-      enum: ["pending", "approved", "rejected"],
-      default: "pending",
+      enum: ["active", "inactive", "suspended", "deleted"],
+      default: "active",
     },
+    verificationStatus: {
+      type: String,
+      enum: ["not_submitted", "pending", "approved", "rejected"],
+      default: "not_submitted",
+    },
+
     // Business Information
     businessName: { type: String },
     businessRegistrationDate: { type: Date },

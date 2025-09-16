@@ -23,7 +23,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "*"],
+    origin: [
+      "http://localhost:5173",
+      "https://global-textile-axis-frontend-git-dev-softinvos-projects.vercel.app",
+    ],
     credentials: true,
   })
 );

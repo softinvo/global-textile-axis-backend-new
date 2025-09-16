@@ -2,6 +2,9 @@ const Buyer = require("../../models/buyer.model");
 const Address = require("../../models/address.model");
 const mongoose = require("mongoose");
 const { addressSchema } = require("../../schemaValidator/address.validator");
+const {
+  updateBuyerProfileSchema,
+} = require("../../schemaValidator/buyer.profile.validator");
 
 const viewProfile = async (req, res) => {
   try {
@@ -25,6 +28,7 @@ const viewProfile = async (req, res) => {
           phone: 1,
           email: 1,
           gender: 1,
+          avatar: 1,
           profileStatus: 1,
           documentInfo: 1,
           addresses: 1,
@@ -53,11 +57,13 @@ const viewProfile = async (req, res) => {
 // Edit Profile
 const editProfile = async (req, res) => {
   try {
-    const { name, phone, email, gender } = req.body;
+    const validateReqBody = await updateBuyerProfileSchema.validateAsync(
+      req.body
+    );
 
     const buyer = await Buyer.findByIdAndUpdate(
       req.userId,
-      { name, phone, email, gender },
+      { $set: validateReqBody },
       { new: true }
     );
 
@@ -67,9 +73,9 @@ const editProfile = async (req, res) => {
         .json({ success: false, message: "Buyer not found" });
     }
 
-    res.status(200).json({ success: true, buyer });
+    return res.status(200).json({ success: true, data: buyer });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error" });
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -161,14 +167,36 @@ const removeAddress = async (req, res) => {
 // View Addresses
 const viewAddresses = async (req, res) => {
   try {
-    const buyer = await Buyer.findById(req.userId).populate("addresses");
-    if (!buyer) {
+    const result = await Buyer.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(req.userId) },
+      },
+      {
+        $lookup: {
+          from: "addresses", // collection name of addresses
+          localField: "addresses",
+          foreignField: "_id",
+          as: "addresses",
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          addresses: 1,
+        },
+      },
+    ]);
+
+    if (!result.length) {
       return res
         .status(404)
         .json({ success: false, message: "Buyer not found" });
     }
-    return res.status(200).json({ success: true, addresses: buyer.addresses });
+
+    // return only the address list
+    return res.status(200).json({ success: true, data: result[0].addresses });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
