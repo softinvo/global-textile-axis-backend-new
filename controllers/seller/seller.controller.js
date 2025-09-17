@@ -89,6 +89,7 @@ const editProfile = async (req, res) => {
     const updatedSeller = await Seller.findByIdAndUpdate(
       sellerId,
       {
+        verificationStatus:"pending",
         ...sellerData,
         ...(addressId && { address: addressId }),
       },
