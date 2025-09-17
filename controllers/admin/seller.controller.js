@@ -57,7 +57,10 @@ const getSellers = async (req, res) => {
           name: 1,
           email: 1,
           phone: 1,
+          gender: 1,
+          avatar: 1,
           profileStatus: 1,
+          verificationStatus: 1,
           businessName: 1,
           businessType: 1,
           businessRegistrationDate: 1,
@@ -135,11 +138,11 @@ const deleteSeller = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Seller not found" });
 
-    res
+    return res
       .status(200)
       .json({ success: true, message: "Seller deleted successfully" });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Server Error" });
+    return res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 

@@ -26,6 +26,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://global-textile-axis-frontend-git-dev-softinvos-projects.vercel.app",
+      "https://global-textile-axis-seller-dashboard-git-dev-softinvos-projects.vercel.app",
     ],
     credentials: true,
   })
