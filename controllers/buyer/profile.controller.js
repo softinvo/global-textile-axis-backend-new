@@ -24,7 +24,9 @@ const viewProfile = async (req, res) => {
       },
       {
         $project: {
-          name: 1,
+          _id: 1,
+          firstName: 1,
+          lastName: 1,
           phone: 1,
           email: 1,
           gender: 1,
@@ -75,7 +77,13 @@ const editProfile = async (req, res) => {
 
     return res.status(200).json({ success: true, data: buyer });
   } catch (error) {
-    return res.status(500).json({ success: false, message: "Server error" });
+    console.error(error);
+    if (error.isJoi === true) {
+      return res.status(422).json({ success: false, message: error.message });
+    }
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server error" });
   }
 };
 
@@ -127,6 +135,9 @@ const addAddress = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    if (error.isJoi === true) {
+      return res.status(422).json({ success: false, message: error.message });
+    }
     return res.status(500).json({
       success: false,
       message: "Failed to add address",

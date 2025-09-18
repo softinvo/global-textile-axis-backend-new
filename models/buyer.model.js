@@ -3,7 +3,8 @@ const attachmentSchema = require("./helpers/attachment.model");
 const jwt = require("jsonwebtoken");
 
 const buyerSchema = new mongoose.Schema({
-  name: { type: String },
+  firstName: { type: String },
+  lastName: { type: String },
   phone: { type: String },
   email: { type: String },
   gender: { type: String, enum: ["Male", "Female", "Other"] },

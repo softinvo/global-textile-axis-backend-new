@@ -1,7 +1,8 @@
 const Joi = require("joi");
 
 const updateBuyerProfileSchema = Joi.object({
-  name: Joi.string().optional(),
+  firstName: Joi.string().optional(),
+  lastName: Joi.string().optional(),
   email: Joi.string().email().optional(),
   gender: Joi.string().valid("male", "female", "other").optional(),
   avatar: Joi.object({

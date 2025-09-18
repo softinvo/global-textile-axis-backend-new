@@ -89,7 +89,7 @@ const editProfile = async (req, res) => {
     const updatedSeller = await Seller.findByIdAndUpdate(
       sellerId,
       {
-        verificationStatus:"pending",
+        verificationStatus: "pending",
         ...sellerData,
         ...(addressId && { address: addressId }),
       },
@@ -108,6 +108,9 @@ const editProfile = async (req, res) => {
     await session.abortTransaction();
     session.endSession();
     console.error(error);
+    if (error.isJoi === true) {
+      return res.status(422).json({ success: false, message: error.message });
+    }
     return res
       .status(500)
       .json({ success: false, message: "Internal Server Error" });
